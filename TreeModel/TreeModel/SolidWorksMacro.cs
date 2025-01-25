@@ -9,6 +9,8 @@ using System.Windows.Forms;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
 using System.Diagnostics;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace TreeModel
 {
@@ -29,6 +31,8 @@ namespace TreeModel
             int nErrors = 0;
             int nWarnings = 0;
 
+            List<Part> list = new List<Part>();
+
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
             // Insert BOM table
@@ -37,7 +41,7 @@ namespace TreeModel
             Configuration = ".";
             nbrType = (int)swNumberingType_e.swNumberingType_Detailed;
 
-            swBOMAnnotation = (BomTableAnnotation)Ext.InsertBomTable3(TemplateName, 0, 0, BomType, Configuration, false, nbrType, true);
+            swBOMAnnotation = (BomTableAnnotation)Ext.InsertBomTable3(TemplateName, 0, 0, BomType, Configuration, false, nbrType, false);
            // swBOMFeature = (BomFeature)swBOMAnnotation.BomFeature;
 
             TableAnnotation swTableAnn = (TableAnnotation)swBOMAnnotation;
@@ -46,25 +50,28 @@ namespace TreeModel
             int I = 0;
             string ItemNumber = null;
             string PartNumber = null;
+            string PathName;
+            string e;
+            string designation;
 
-       
 
             nNumRow = swTableAnn.RowCount;
             for (J = 0; J <= nNumRow - 1; J++)
             {
             
-                Debug.Print("   Row Number " + J);
-                Debug.Print("     Component Count: " + swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber));
-               
-                Debug.Print("       Item Number: " + ItemNumber);
-                Debug.Print("       Part Number: " + PartNumber);
-                if (PartNumber == null) continue;
+             
+                swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber);               
+                if (PartNumber == null || PartNumber == "") continue;
                 string[] str= (string[])swBOMAnnotation.GetModelPathNames(J, out ItemNumber, out PartNumber);
-              
 
-                Debug.Print(str[0]);
-      
-                
+
+                PathName = str[0];
+                designation = Path.GetFileNameWithoutExtension(PathName);
+                string regCuby = @"^CUBY-\d{8}$";
+                bool IsCUBY = Regex.IsMatch(PartNumber, regCuby);
+                if (!IsCUBY) continue;
+                Part part = new Part(ItemNumber, PartNumber, PathName);
+                list.Add(part);
             }
 
 
