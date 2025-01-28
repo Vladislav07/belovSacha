@@ -53,7 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assembly.cs" />
     <Compile Include="Part.cs" />
+    <Compile Include="PDM.cs" />
     <Compile Include="SolidWorksMacroStartup.cs">
       <DependentUpon>SolidWorksMacro.cs</DependentUpon>
     </Compile>

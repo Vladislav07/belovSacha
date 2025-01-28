@@ -16,6 +16,7 @@ namespace TreeModel
 {
     public partial class SolidWorksMacro
     {
+
         public void Main()
         {
             ModelDoc2 swModel = default(ModelDoc2); 
@@ -36,7 +37,7 @@ namespace TreeModel
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
             // Insert BOM table
-            TemplateName = "C:\\Program Files\\SOLIDWORKS Corp\\SOLIDWORKS\\lang\\english\\bom-standard.sldbomtbt";
+            TemplateName = @"C:\CUBY_PDM\library\templates\BOM Templates\FullBOM_template.sldbomtbt";
             BomType = (int)swBomType_e.swBomType_Indented;
             Configuration = ".";
             nbrType = (int)swNumberingType_e.swNumberingType_Detailed;
@@ -60,25 +61,66 @@ namespace TreeModel
             {
             
              
-                swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber);               
-                if (PartNumber == null || PartNumber == "") continue;
+                swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber);
+                /*
+                  object[] vPtArr = null;
+                  Component2 swComp = null;
+                  object pt = null;
+
+                  vPtArr = (object[])swBOMAnnotation.GetComponents2(J, Configuration);
+
+                  if (((vPtArr != null)))
+                  {
+                      for (I = 0; I <= vPtArr.GetUpperBound(0); I++)
+                      {
+                          pt = vPtArr[I];
+                          swComp = (Component2)pt;
+                          if ((swComp != null))
+                          {
+                              Debug.Print("           Component Name: " + swComp.Name2);
+                              Debug.Print("           Configuration Name: " + swComp.ReferencedConfiguration);
+                              Debug.Print("           Component Path: " + swComp.GetPathName());
+                          }
+                          else
+                          {
+                              Debug.Print("  Could not get component.");
+                          }
+                      }
+                  }
+                */
+               
+                if (PartNumber == null) continue;
+                string PartNumberTrim = PartNumber.Trim();
                 string[] str= (string[])swBOMAnnotation.GetModelPathNames(J, out ItemNumber, out PartNumber);
 
 
                 PathName = str[0];
                 designation = Path.GetFileNameWithoutExtension(PathName);
                 string regCuby = @"^CUBY-\d{8}$";
-                bool IsCUBY = Regex.IsMatch(PartNumber, regCuby);
+                bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
                 if (!IsCUBY) continue;
                 Part part = new Part(ItemNumber, PartNumber, PathName);
                 list.Add(part);
             }
 
-
+            GroupByCol(list);
                 return;
         }
       
+       void GroupByCol(List<Part> list)
+        {
+            var collection = list.GroupBy(p => p.StructureNumber.Length);
+            foreach (var company in collection)
+            {
+                Debug.Print(company.Key.ToString());
 
+                foreach (var person in company.Distinct(new CompPart()))
+                {
+                    Debug.Print(person.CubyNumber);
+                }
+                
+            }
+        }
         // The SldWorks swApp variable is pre-assigned for you.
         public SldWorks swApp;
 
