@@ -16,13 +16,17 @@ namespace TreeModel
 {
     public partial class SolidWorksMacro
     {
-
+        PDM pdm = null;
+        
         public void Main()
         {
             ModelDoc2 swModel = default(ModelDoc2); 
             ModelDocExtension Ext = default(ModelDocExtension);
             BomTableAnnotation swBOMAnnotation = default(BomTableAnnotation);
             BomFeature swBOMFeature = default(BomFeature);
+           
+
+
             Configuration swConf;
             Component2 swRootComp;
             string Configuration = null;
@@ -31,9 +35,10 @@ namespace TreeModel
             int BomType = 0;
             int nErrors = 0;
             int nWarnings = 0;
+            bool boolstatus = false;
 
             List<Part> list = new List<Part>();
-
+            pdm = new PDM();
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
             // Insert BOM table
@@ -43,7 +48,7 @@ namespace TreeModel
             nbrType = (int)swNumberingType_e.swNumberingType_Detailed;
 
             swBOMAnnotation = (BomTableAnnotation)Ext.InsertBomTable3(TemplateName, 0, 0, BomType, Configuration, false, nbrType, false);
-           // swBOMFeature = (BomFeature)swBOMAnnotation.BomFeature;
+            swBOMFeature = (BomFeature)swBOMAnnotation.BomFeature;
 
             TableAnnotation swTableAnn = (TableAnnotation)swBOMAnnotation;
             int nNumRow = 0;
@@ -54,41 +59,17 @@ namespace TreeModel
             string PathName;
             string e;
             string designation;
+            string BomName;
 
-
+            BomName = swBOMFeature.Name;
             nNumRow = swTableAnn.RowCount;
+
             for (J = 0; J <= nNumRow - 1; J++)
             {
             
              
                 swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber);
-                /*
-                  object[] vPtArr = null;
-                  Component2 swComp = null;
-                  object pt = null;
-
-                  vPtArr = (object[])swBOMAnnotation.GetComponents2(J, Configuration);
-
-                  if (((vPtArr != null)))
-                  {
-                      for (I = 0; I <= vPtArr.GetUpperBound(0); I++)
-                      {
-                          pt = vPtArr[I];
-                          swComp = (Component2)pt;
-                          if ((swComp != null))
-                          {
-                              Debug.Print("           Component Name: " + swComp.Name2);
-                              Debug.Print("           Configuration Name: " + swComp.ReferencedConfiguration);
-                              Debug.Print("           Component Path: " + swComp.GetPathName());
-                          }
-                          else
-                          {
-                              Debug.Print("  Could not get component.");
-                          }
-                      }
-                  }
-                */
-               
+                         
                 if (PartNumber == null) continue;
                 string PartNumberTrim = PartNumber.Trim();
                 string[] str= (string[])swBOMAnnotation.GetModelPathNames(J, out ItemNumber, out PartNumber);
@@ -100,28 +81,37 @@ namespace TreeModel
                 bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
                 if (!IsCUBY) continue;
                 Part part = new Part(ItemNumber, PartNumber, PathName);
+              
                 list.Add(part);
             }
 
             GroupByCol(list);
-                return;
+
+           
+            boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
+            swModel.ClearSelection2(true);
+            return;
         }
-      
-       void GroupByCol(List<Part> list)
+
+        private void Tree_IsEventRebuild(string arg1, string arg2, int arg3)
+        {
+            throw new NotImplementedException();
+        }
+
+        void GroupByCol(List<Part> list)
         {
             var collection = list.GroupBy(p => p.StructureNumber.Length);
+          
             foreach (var company in collection)
-            {
-                Debug.Print(company.Key.ToString());
-
+            {              
                 foreach (var person in company.Distinct(new CompPart()))
                 {
-                    Debug.Print(person.CubyNumber);
+                    pdm.GetEdmFile(person);
                 }
                 
             }
         }
-        // The SldWorks swApp variable is pre-assigned for you.
+      
         public SldWorks swApp;
 
     }

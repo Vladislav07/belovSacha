@@ -21,13 +21,22 @@ namespace TreeModel
         IEdmBatchUnlock2 batchUnlocker;
         List<Part> list { get; set; }
 
-        public PDM(ref List<Part> l)
+        public PDM()
         {
-            list = l;
-
-            ppoSelection = new EdmSelItem[list.Count];
             vault1 = new EdmVault5();
             ConnectingPDM();
+        }
+
+        public void GetEdmFile(Part item)
+        {
+            IEdmFile5 File = null;
+            IEdmFolder5 ParentFolder = null;
+         
+            File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
+            item.File = File;
+        
+           
+
         }
 
         void AddSelItemToList()
