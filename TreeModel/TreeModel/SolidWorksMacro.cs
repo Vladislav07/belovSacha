@@ -16,7 +16,7 @@ namespace TreeModel
 {
     public partial class SolidWorksMacro
     {
-        PDM pdm = null;
+     
         
         public void Main()
         {
@@ -24,8 +24,6 @@ namespace TreeModel
             ModelDocExtension Ext = default(ModelDocExtension);
             BomTableAnnotation swBOMAnnotation = default(BomTableAnnotation);
             BomFeature swBOMFeature = default(BomFeature);
-           
-
 
             Configuration swConf;
             Component2 swRootComp;
@@ -38,7 +36,7 @@ namespace TreeModel
             bool boolstatus = false;
 
             List<Part> list = new List<Part>();
-            pdm = new PDM();
+          
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
             // Insert BOM table
@@ -60,9 +58,10 @@ namespace TreeModel
             string e;
             string designation;
             string BomName;
-
+            Component component = null;
             BomName = swBOMFeature.Name;
             nNumRow = swTableAnn.RowCount;
+
 
             for (J = 0; J <= nNumRow - 1; J++)
             {
@@ -80,12 +79,18 @@ namespace TreeModel
                 string regCuby = @"^CUBY-\d{8}$";
                 bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
                 if (!IsCUBY) continue;
-                Part part = new Part(ItemNumber, PartNumber, PathName);
-              
-                list.Add(part);
-            }
+                e = Path.GetExtension(PathName);
+                if(e=="SLDPRT" || e=="sldprt")
+                {
+                   component = new Part(ItemNumber, PartNumber, PathName);
+                }
+                else if(e == "SLDASM" || e == "sldasm")
+                {
+                    component = new Assembly(ItemNumber, PartNumber, PathName);
+                }
 
-            GroupByCol(list);
+                Tree.AddPart(component);
+            }
 
            
             boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
@@ -93,24 +98,9 @@ namespace TreeModel
             return;
         }
 
-        private void Tree_IsEventRebuild(string arg1, string arg2, int arg3)
-        {
-            throw new NotImplementedException();
-        }
+      
 
-        void GroupByCol(List<Part> list)
-        {
-            var collection = list.GroupBy(p => p.StructureNumber.Length);
-          
-            foreach (var company in collection)
-            {              
-                foreach (var person in company.Distinct(new CompPart()))
-                {
-                    pdm.GetEdmFile(person);
-                }
-                
-            }
-        }
+    
       
         public SldWorks swApp;
 

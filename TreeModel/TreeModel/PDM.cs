@@ -12,33 +12,61 @@ using System.Text.RegularExpressions;
 
 namespace TreeModel
 {
-   public class PDM
+   public static class PDM
     {
-        IEdmVault5 vault1 = null;
-        IEdmVault7 vault = null;
-        IEdmBatchGet batchGetter;
+        static IEdmVault5 vault1 = null;
+        static IEdmVault7 vault = null;
+        static IEdmBatchGet batchGetter;
         static EdmSelItem[] ppoSelection = null;
-        IEdmBatchUnlock2 batchUnlocker;
-        List<Part> list { get; set; }
+        static IEdmBatchUnlock2 batchUnlocker;
 
-        public PDM()
+
+
+         static PDM()
         {
             vault1 = new EdmVault5();
             ConnectingPDM();
         }
 
-        public void GetEdmFile(Part item)
+        public static void GetEdmFile(this Component item)
         {
             IEdmFile5 File = null;
             IEdmFolder5 ParentFolder = null;
          
             File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
-            item.File = File;
+            (item as Part).File = File;
         
            
 
         }
 
+        public static void GetReferenceFile(IEdmFile5 bFile, IEdmFolder5 bFolder)
+        {
+            IEdmReference5 ref5 = bFile.GetReferenceTree(bFolder.ID);
+            IEdmReference10 ref10 = (IEdmReference10)ref5;
+            IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
+            while (!pos.IsNull)
+            {
+
+                IEdmReference10 @ref = (IEdmReference10)ref5.GetNextChild(pos);
+                //
+                string extension = Path.GetExtension(@ref.Name);
+                if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
+                {
+                    workRow[GetAssemblyID.strRev] = @ref.
+                    refDrToModel = @ref.VersionRef;
+                    break;
+                }
+                else
+                {
+                    ref5.GetNextChild(pos);
+                }
+            }
+        }
+              
+
+
+       /*
         void AddSelItemToList()
         {
             int i = 0;
@@ -101,10 +129,10 @@ namespace TreeModel
                 MessageBox.Show(ex.Message);
             }
         }
+        */
 
-
-        void ConnectingPDM()
-        {
+         static void  ConnectingPDM()
+         {
             try
             {
                 if (!vault1.IsLoggedIn)

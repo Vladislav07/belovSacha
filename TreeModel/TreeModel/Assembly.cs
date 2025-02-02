@@ -8,15 +8,15 @@ namespace TreeModel
 {
     public class Assembly : Part
     {
-        List<Part> list;
+        List<Component> listChild;
         public Assembly(string sn, string cn, string fn) : base(sn, cn, fn)
         {
-            list = new List<Part>();
+            listChild = new List<Component>();
         }
 
-        public void AddComponent(Part part)
+        public void AddComponent(Component comp)
         {
-
+            listChild.Add(comp);
         }
     }
 }

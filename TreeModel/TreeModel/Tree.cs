@@ -10,23 +10,37 @@ namespace TreeModel
     {
 
         
-        static Dictionary<string, Part> list;
+        static List<Component> list;
 
         static Tree()
         {
            
-            list = new Dictionary<string, Part>();
+            list = new List<Component>();
         }
 
-        public static void AddPart(Part part)
+        public static void AddPart(Component part)
         {
-            part.IsEventRebuild += Part_IsEventRebuild;
-            list.Add(part.StructureNumber, part);
+            part.IsChild += Part_IsEventRebuild;
+            list.Add(part);
         }
 
-        private static void Part_IsEventRebuild(string key, string cubyNumber, int versionPart)
+        private static void Part_IsEventRebuild(string key, string cubyNumber)
         {
             string keyParent = key;
+
+        }
+        static void  GroupByCol()
+        {
+            var collection = list.GroupBy(p => p.StructureNumber.Length);
+
+            foreach (var company in collection)
+            {
+                foreach (Part item in company.Distinct(new CompPart()))
+                {
+                    item.GetEdmFile();
+                }
+
+            }
         }
     }
 }

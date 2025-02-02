@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPDM.Interop.epdm">
-      <HintPath>C:\Users\v.belov\source\RebuildCUBY\TreeModel\TreeModel\Resources\EPDM.Interop.epdm.dll</HintPath>
+      <HintPath>C:\Users\belov\source\belovSacha\TreeModel\TreeModel\Resources\EPDM.Interop.epdm.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">
@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembly.cs" />
+    <Compile Include="Component.cs" />
     <Compile Include="Part.cs" />
     <Compile Include="PDM.cs" />
     <Compile Include="SolidWorksMacroStartup.cs">
