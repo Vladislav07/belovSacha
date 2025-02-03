@@ -32,7 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPDM.Interop.epdm">
-      <HintPath>C:\Users\belov\source\belovSacha\TreeModel\TreeModel\Resources\EPDM.Interop.epdm.dll</HintPath>
+      <HintPath>C:\Users\v.belov\source\RebuildCUBY\TreeModel\TreeModel\Resources\EPDM.Interop.epdm.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="SolidWorks.Interop.sldworks">

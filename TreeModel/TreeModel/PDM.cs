@@ -40,11 +40,13 @@ namespace TreeModel
 
         }
 
-        public static void GetReferenceFile(IEdmFile5 bFile, IEdmFolder5 bFolder)
+        public static void GetReferenceFromAssemble(this Assembly ass, IEdmFile5 bFile, IEdmFolder5 bFolder)
         {
             IEdmReference5 ref5 = bFile.GetReferenceTree(bFolder.ID);
             IEdmReference10 ref10 = (IEdmReference10)ref5;
             IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
+            string cubyNumber = null;
+            int verChildRef = -1;
             while (!pos.IsNull)
             {
 
@@ -53,8 +55,9 @@ namespace TreeModel
                 string extension = Path.GetExtension(@ref.Name);
                 if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
                 {
-                    workRow[GetAssemblyID.strRev] = @ref.
-                    refDrToModel = @ref.VersionRef;
+                    cubyNumber = Path.GetFileNameWithoutExtension(@ref.Name);
+                    verChildRef = @ref.VersionRef;
+                    ass.listRefChild.Add(cubyNumber, verChildRef);
                     break;
                 }
                 else
