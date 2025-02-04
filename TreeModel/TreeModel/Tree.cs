@@ -11,11 +11,12 @@ namespace TreeModel
 
         
         static List<Component> list;
-
+        static Dictionary<string, Component> listComp;
         static Tree()
         {
            
             list = new List<Component>();
+            listComp = new Dictionary<string, Component>();
         }
 
         public static void AddPart(Component part)
@@ -26,8 +27,28 @@ namespace TreeModel
 
         private static void Part_IsEventRebuild(string key, string cubyNumber)
         {
-            string keyParent = key;
+            Assembly ass = null;
+            Component comp= list.FirstOrDefault(p=>p.CubyNumber ==cubyNumber);
+            int index = -1;
+            string s = ".";
+            char[] chars = s.ToCharArray();
+            index = key.LastIndexOfAny(chars);
+            if (index == -1)
+            {
 
+            }
+            else
+            {
+                string keyParent = key.Take(index).ToString();
+                Component target = listComp[keyParent];
+                if (target == null) return;
+                if (target is Assembly)
+                {
+                    ass = target as Assembly;
+                }
+            }
+
+            
         }
         static void  GroupByCol()
         {
@@ -35,9 +56,10 @@ namespace TreeModel
 
             foreach (var company in collection)
             {
-                foreach (Part item in company.Distinct(new CompPart()))
+                foreach (Component item in company.Distinct(new CompPart()))
                 {
                     item.GetEdmFile();
+                    listComp.Add(item.StructureNumber, item);
                 }
 
             }
