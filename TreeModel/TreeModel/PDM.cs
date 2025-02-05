@@ -34,15 +34,14 @@ namespace TreeModel
             IEdmFolder5 ParentFolder = null;
          
             File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
+            //if File==null
             item.File = File;
-        
-           
-
+            item.bFolder = ParentFolder.ID;    
         }
 
-        public static void GetReferenceFromAssemble(this Assembly ass, IEdmFile5 bFile, IEdmFolder5 bFolder)
+        public static void GetReferenceFromAssemble(this Component ass)
         {
-            IEdmReference5 ref5 = bFile.GetReferenceTree(bFolder.ID);
+            IEdmReference5 ref5 = ass.File.GetReferenceTree(ass.bFolder);
             IEdmReference10 ref10 = (IEdmReference10)ref5;
             IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
             string cubyNumber = null;
@@ -140,7 +139,7 @@ namespace TreeModel
             {
                 if (!vault1.IsLoggedIn)
                 {
-                    vault1.LoginAuto("CUBY_PDM", 0);
+                    vault1.LoginAuto("My", 0);
                 }
                 vault = (IEdmVault7)vault1;
             }

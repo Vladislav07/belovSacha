@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace TreeModel
 {
@@ -23,37 +24,18 @@ namespace TreeModel
         {
       
             list.Add(part);
-            listComp.Add(part.StructureNumber, part);
+            listComp.Add(part.CubyNumber, part);
         }
 
-        public static void Part_IsChild(string key, string cubyNumber)
+        public static bool Part_IsChild(string cubyNumber, int VersChild)
         {
-            if (key == "0") return;
 
-            Assembly ass = null;
-            Component comp = list.FirstOrDefault(p=>p.CubyNumber == cubyNumber);
-         
-            
-            int index = -1;
-            string s = ".";
-            char[] chars = s.ToCharArray();
-            index = key.LastIndexOfAny(chars);
-            if (index == -1)
-            {
+            Component comp = listComp[cubyNumber];
+            if (comp == null) return false;
 
-            }
-            else
-            {
-                string keyParent = key.Take(index).ToString();
-                Component target = listComp[keyParent];
-                if (target == null) return;
-                if (target is Assembly)
-                {
-                    ass = target as Assembly;
-                }
-            }
+            if (comp.CurVersion == VersChild) return false;
 
-            
+            return true;
         }
        public static void  GroupByCol()
         {
@@ -64,7 +46,22 @@ namespace TreeModel
                 foreach (Component item in company.Distinct(new CompPart()))
                 {
                     item.GetEdmFile();
-                    listComp.Add(item.StructureNumber, item);
+                    item.GetReferenceFromAssemble();
+                }
+
+            }
+        }
+
+        public static void Print()
+        {
+            var collection = list.GroupBy(p => p.StructureNumber.Length);
+
+            foreach (var company in collection)
+            {
+                foreach (Component item in company.Distinct(new CompPart()))
+                {
+                    Debug.Print(item.StructureNumber + "-" + company.Key + "-" + item.CubyNumber);
+
                 }
 
             }

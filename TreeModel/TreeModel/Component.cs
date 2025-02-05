@@ -7,7 +7,7 @@ using EPDM.Interop.epdm;
 
 namespace TreeModel
 {
-   public abstract class Component
+   public class Component
     { 
    
         public string StructureNumber { get; private set; }
@@ -16,14 +16,19 @@ namespace TreeModel
         IEdmFile5 _File = null;
         public int CurVersion { get; set; }
         public IEdmState5 State { get; set; }
+        public int  bFolder { get; set; }
+
+        public Dictionary<string, int> listRefChild;
+
+        public bool IsRebuild { get;private set; }
 
         public Component(string sn, string cn, string fn)
         {
             StructureNumber = sn;
             CubyNumber = cn;
             FullPath = fn;
-      
-            Tree.Part_IsChild(StructureNumber, CubyNumber);
+            listRefChild = new Dictionary<string, int>();
+            IsRebuild = false;
         }
         public IEdmFile5 File
         {
@@ -34,6 +39,19 @@ namespace TreeModel
                 CurVersion = _File.CurrentVersion;
                 State = _File.CurrentState;
                 
+            }
+        }
+
+        public void isNeedsRebuld()
+        {
+            if (listRefChild == null) return;
+            foreach (KeyValuePair<string,int> item in listRefChild)
+            {
+               bool isRebuld= Tree.Part_IsChild(item.Key, item.Value);
+               if (isRebuld)
+                {
+                    IsRebuild = true;
+                }
             }
         }
 
