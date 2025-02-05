@@ -21,14 +21,19 @@ namespace TreeModel
 
         public static void AddPart(Component part)
         {
-            part.IsChild += Part_IsEventRebuild;
+      
             list.Add(part);
+            listComp.Add(part.StructureNumber, part);
         }
 
-        private static void Part_IsEventRebuild(string key, string cubyNumber)
+        public static void Part_IsChild(string key, string cubyNumber)
         {
+            if (key == "0") return;
+
             Assembly ass = null;
-            Component comp= list.FirstOrDefault(p=>p.CubyNumber ==cubyNumber);
+            Component comp = list.FirstOrDefault(p=>p.CubyNumber == cubyNumber);
+         
+            
             int index = -1;
             string s = ".";
             char[] chars = s.ToCharArray();
@@ -50,7 +55,7 @@ namespace TreeModel
 
             
         }
-        static void  GroupByCol()
+       public static void  GroupByCol()
         {
             var collection = list.GroupBy(p => p.StructureNumber.Length);
 

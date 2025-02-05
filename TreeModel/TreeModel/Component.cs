@@ -3,33 +3,41 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EPDM.Interop.epdm;
 
 namespace TreeModel
 {
    public abstract class Component
     { 
-        public event Action<string, string> IsChild;
+   
         public string StructureNumber { get; private set; }
         public string CubyNumber { get; private set; }
         public string FullPath { get; private set; }
+        IEdmFile5 _File = null;
+        public int CurVersion { get; set; }
+        public IEdmState5 State { get; set; }
 
         public Component(string sn, string cn, string fn)
         {
             StructureNumber = sn;
             CubyNumber = cn;
             FullPath = fn;
-            IsChild = new Action<string, string>(UpdateState);
+      
+            Tree.Part_IsChild(StructureNumber, CubyNumber);
         }
-
-        private void UpdateState(string arg1, string arg2)
+        public IEdmFile5 File
         {
-           
-            if (IsChild != null)
+            get { return _File; }
+            set
             {
-                IsChild.Invoke(arg1, arg2);
+                _File = value;
+                CurVersion = _File.CurrentVersion;
+                State = _File.CurrentState;
+                
             }
-
         }
+
+      
     }
     public class CompPart : EqualityComparer<Component>
     {

@@ -34,7 +34,7 @@ namespace TreeModel
             IEdmFolder5 ParentFolder = null;
          
             File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
-            (item as Part).File = File;
+            item.File = File;
         
            
 

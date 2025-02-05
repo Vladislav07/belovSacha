@@ -25,20 +25,25 @@ namespace TreeModel
             BomTableAnnotation swBOMAnnotation = default(BomTableAnnotation);
             BomFeature swBOMFeature = default(BomFeature);
 
-            Configuration swConf;
-            Component2 swRootComp;
+           // Configuration swConf;
+           // Component2 swRootComp;
             string Configuration = null;
             string TemplateName = null;
             int nbrType = 0;
             int BomType = 0;
-            int nErrors = 0;
-            int nWarnings = 0;
+           // int nErrors = 0;
+           // int nWarnings = 0;
             bool boolstatus = false;
+            Component compRoot = null;
 
-            List<Part> list = new List<Part>();
+           // List<Part> list = new List<Part>();
           
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
+            string rootPath = swModel.GetPathName();
+            string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
+            compRoot = new Assembly("0", nameRoot, rootPath);
+            Tree.AddPart(compRoot);
             // Insert BOM table
             TemplateName = @"C:\CUBY_PDM\library\templates\BOM Templates\FullBOM_template.sldbomtbt";
             BomType = (int)swBomType_e.swBomType_Indented;
@@ -51,22 +56,21 @@ namespace TreeModel
             TableAnnotation swTableAnn = (TableAnnotation)swBOMAnnotation;
             int nNumRow = 0;
             int J = 0;
-            int I = 0;
             string ItemNumber = null;
             string PartNumber = null;
             string PathName;
             string e;
             string designation;
             string BomName;
-            Component component = null;
+            
             BomName = swBOMFeature.Name;
             nNumRow = swTableAnn.RowCount;
 
 
             for (J = 0; J <= nNumRow - 1; J++)
             {
-            
-             
+
+                Component component;
                 swBOMAnnotation.GetComponentsCount2(J, Configuration, out ItemNumber, out PartNumber);
                          
                 if (PartNumber == null) continue;
@@ -80,28 +84,33 @@ namespace TreeModel
                 bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
                 if (!IsCUBY) continue;
                 e = Path.GetExtension(PathName);
-                if(e=="SLDPRT" || e=="sldprt")
+                string AddextendedNumber = "0." + ItemNumber;
+                if (e==".SLDPRT" || e==".sldprt")
                 {
-                   component = new Part(ItemNumber, PartNumber, PathName);
+                   component = new Part(AddextendedNumber, PartNumber, PathName);
+                   Tree.AddPart(component);
                 }
-                else if(e == "SLDASM" || e == "sldasm")
+                else if(e == ".SLDASM" || e == ".sldasm")
                 {
-                    component = new Assembly(ItemNumber, PartNumber, PathName);
+                    component = new Assembly(AddextendedNumber, PartNumber, PathName);
+                    Tree.AddPart(component);
                 }
-
-                Tree.AddPart(component);
+                  
+               
             }
 
+            Tree.GroupByCol();
            
             boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
             swModel.ClearSelection2(true);
             return;
         }
 
-      
+       
 
-    
-      
+
+
+
         public SldWorks swApp;
 
     }
