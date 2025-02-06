@@ -37,6 +37,7 @@ namespace TreeModel
 
             return true;
         }
+
        public static void  GroupByCol()
         {
             var collection = list.GroupBy(p => p.StructureNumber.Length);

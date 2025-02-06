@@ -45,8 +45,8 @@ namespace TreeModel
             compRoot = new Assembly("0", nameRoot, rootPath);
             Tree.AddPart(compRoot);
             // Insert BOM table
-            // TemplateName = @"C:\CUBY_PDM\library\templates\BOM Templates\FullBOM_template.sldbomtbt";
-            TemplateName = @"A:\My\library\templates\Спецификация.sldbomtbt";
+            TemplateName = @"C:\CUBY_PDM\library\templates\BOM Templates\FullBOM_template.sldbomtbt";
+           // TemplateName = @"A:\My\library\templates\Спецификация.sldbomtbt";
             BomType = (int)swBomType_e.swBomType_Indented;
             Configuration = ".";
             nbrType = (int)swNumberingType_e.swNumberingType_Detailed;
@@ -81,9 +81,9 @@ namespace TreeModel
 
                 PathName = str[0];
                 designation = Path.GetFileNameWithoutExtension(PathName);
-              //  string regCuby = @"^CUBY-\d{8}$";
-              //  bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
-              //  if (!IsCUBY) continue;
+                string regCuby = @"^CUBY-\d{8}$";
+                bool IsCUBY = Regex.IsMatch(PartNumberTrim, regCuby);
+                if (!IsCUBY) continue;
                 e = Path.GetExtension(PathName);
                 string AddextendedNumber = "0." + ItemNumber;
                 if (e==".SLDPRT" || e==".sldprt" || e == ".SLDASM" || e == ".sldasm")

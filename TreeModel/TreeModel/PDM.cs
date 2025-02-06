@@ -41,6 +41,8 @@ namespace TreeModel
 
         public static void GetReferenceFromAssemble(this Component ass)
         {
+            string e = Path.GetFileNameWithoutExtension(ass.FullPath);
+            if (e == ".SLDPRT" || e == ".sldprt") return;
             IEdmReference5 ref5 = ass.File.GetReferenceTree(ass.bFolder);
             IEdmReference10 ref10 = (IEdmReference10)ref5;
             IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
