@@ -24,18 +24,29 @@ namespace TreeModel
         {
       
             list.Add(part);
+            if (listComp.ContainsKey(part.CubyNumber)) return;
             listComp.Add(part.CubyNumber, part);
         }
 
-        public static bool Part_IsChild(string cubyNumber, int VersChild)
+        public static int Part_IsChild(string cubyNumber, int VersChild)
         {
-
+            if (!listComp.ContainsKey(cubyNumber)) return -1;
             Component comp = listComp[cubyNumber];
-            if (comp == null) return false;
+            if (comp == null) return -1;
 
-            if (comp.CurVersion == VersChild) return false;
+            if (comp.CurVersion != VersChild) return comp.CurVersion;
+           // if (comp.IsRebuild) return true;
+            return -1;
+        }
 
-            return true;
+        public static void SearchParentFromChildIsRebuild(string ChildNumber, string StructureNumberChild)
+        {
+            int index = StructureNumberChild.LastIndexOf(new char[] { '.' }[0]);
+            string ParentStrNumb = StructureNumberChild.Substring(0, index);
+            Component comp = list.FirstOrDefault(p => p.StructureNumber == ParentStrNumb);
+            comp.IsRebuild = true;
+            if (comp.listRefChildError.ContainsKey(ChildNumber)) return;
+            comp.listRefChildError.Add(ChildNumber, "Rebuilding expected");
         }
 
        public static void  GroupByCol()
@@ -53,7 +64,7 @@ namespace TreeModel
             }
         }
 
-        public static void Print()
+        public static void SearchForOldLinks()
         {
             var collection = list.GroupBy(p => p.StructureNumber.Length);
 
@@ -61,11 +72,33 @@ namespace TreeModel
             {
                 foreach (Component item in company.Distinct(new CompPart()))
                 {
-                    Debug.Print(item.StructureNumber + "-" + company.Key + "-" + item.CubyNumber);
+                    item.isNeedsRebuld();
+                    
+                }
+
+            }
+        }
+
+        public static List<Component> Print()
+        {
+            List<Component> l = new List<Component>();
+            var collection = list.GroupBy(p => p.Level);
+
+            foreach (var company in collection)
+            {
+                foreach (Component item in company.Distinct(new CompPart()))
+                {
+                  
+                    if (item.IsRebuild == true)
+                    {
+                       
+                       l.Add(item);
+                    }
 
                 }
 
             }
+            return l;
         }
     }
 }

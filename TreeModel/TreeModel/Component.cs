@@ -17,10 +17,10 @@ namespace TreeModel
         public int CurVersion { get; set; }
         public IEdmState5 State { get; set; }
         public int  bFolder { get; set; }
-
+        public int Level { get; set; }
         public Dictionary<string, int> listRefChild;
-
-        public bool IsRebuild { get;private set; }
+        public Dictionary<string, string> listRefChildError;
+        public bool IsRebuild { get; set; }
 
         public Component(string sn, string cn, string fn)
         {
@@ -28,6 +28,9 @@ namespace TreeModel
             CubyNumber = cn;
             FullPath = fn;
             listRefChild = new Dictionary<string, int>();
+            listRefChildError = new Dictionary<string, string>();
+            Level = StructureNumber.Split(new char[] { '.' }).Length;
+
             IsRebuild = false;
         }
         public IEdmFile5 File
@@ -47,11 +50,15 @@ namespace TreeModel
             if (listRefChild == null) return;
             foreach (KeyValuePair<string,int> item in listRefChild)
             {
-               bool isRebuld= Tree.Part_IsChild(item.Key, item.Value);
-               if (isRebuld)
+   
+               int isVers= Tree.Part_IsChild(item.Key, item.Value);
+               if (isVers!=-1)
                 {
                     IsRebuild = true;
+                    listRefChildError.Add(item.Key, item.Value.ToString() + "/"+ isVers.ToString());
+                    Tree.SearchParentFromChildIsRebuild(CubyNumber, StructureNumber);
                 }
+          
             }
         }
 

@@ -11,6 +11,7 @@ using SolidWorks.Interop.swconst;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace TreeModel
 {
@@ -18,7 +19,7 @@ namespace TreeModel
     {
      
         
-        public void Main()
+        public async void Main()
         {
             ModelDoc2 swModel = default(ModelDoc2); 
             ModelDocExtension Ext = default(ModelDocExtension);
@@ -88,23 +89,71 @@ namespace TreeModel
                 string AddextendedNumber = "0." + ItemNumber;
                 if (e==".SLDPRT" || e==".sldprt" || e == ".SLDASM" || e == ".sldasm")
                 {
-                   component = new Component(AddextendedNumber, PartNumber, PathName);
+                   component = new Component(AddextendedNumber, PartNumberTrim, PathName);
                    Tree.AddPart(component);
                 }
                   
             }
 
             Tree.GroupByCol();
-            Tree.Print();
-           
-            boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
+            Tree.SearchForOldLinks();
+             boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
             swModel.ClearSelection2(true);
+            List<Component> l = Tree.Print();
+
+            await Task.Run(() => CreateNewForm( l));
+            
             return;
         }
-
        
+   
+        private void CreateNewForm(List<Component> l)
+        {
+            Application.Run(new FormInfo(l));
+
+        }
+
+        public void OpenAndRefresh(List<Component> list)
+        {
+            ModelDoc2 swModelDoc = default(ModelDoc2);
+            int errors = 0;
+            int warnings = 0;
+            int lErrors = 0;
+            int lWarnings = 0;
+            ModelDocExtension extMod;
+            string fileName = null;
 
 
+            try
+            {
+                var collection = list.GroupBy(p => p.StructureNumber.Length);
+
+                foreach (var company in collection)
+                {
+                    foreach (Component item in company.Distinct(new CompPart()))
+                    {
+
+                        fileName = item.FullPath;
+                        swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+                        extMod = swModelDoc.Extension;
+                        extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
+                        swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+                        swApp.CloseDoc(fileName);
+                        swModelDoc = null;
+
+                    }
+
+                }
+                {
+              
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show(errors.ToString());
+
+            }
+        }
 
 
         public SldWorks swApp;

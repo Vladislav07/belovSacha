@@ -30,6 +30,7 @@ namespace TreeModel
 
         public static void GetEdmFile(this Component item)
         {
+           
             IEdmFile5 File = null;
             IEdmFolder5 ParentFolder = null;
          
@@ -41,7 +42,7 @@ namespace TreeModel
 
         public static void GetReferenceFromAssemble(this Component ass)
         {
-            string e = Path.GetFileNameWithoutExtension(ass.FullPath);
+            string e = Path.GetExtension(ass.FullPath);
             if (e == ".SLDPRT" || e == ".sldprt") return;
             IEdmReference5 ref5 = ass.File.GetReferenceTree(ass.bFolder);
             IEdmReference10 ref10 = (IEdmReference10)ref5;
@@ -57,9 +58,12 @@ namespace TreeModel
                 if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
                 {
                     cubyNumber = Path.GetFileNameWithoutExtension(@ref.Name);
+                    string regCuby = @"^CUBY-\d{8}$";
+                    bool IsCUBY = Regex.IsMatch(cubyNumber.Trim(), regCuby);
+                    if (!IsCUBY) continue;
                     verChildRef = @ref.VersionRef;
-                    ass.listRefChild.Add(cubyNumber, verChildRef);
-                    break;
+                    ass.listRefChild.Add(cubyNumber.Trim(), verChildRef);
+           
                 }
                 else
                 {
@@ -67,25 +71,20 @@ namespace TreeModel
                 }
             }
         }
-              
 
 
-       /*
-        void AddSelItemToList()
+
+
+        public static void AddSelItemToList(List<Component>updateList)
         {
             int i = 0;
-            IEdmFile5 File = null;
-            IEdmFolder5 ParentFolder = null;
-
             try
             {
-                foreach (Part item in list)
+                foreach (Component item in updateList)
                 {
-                    File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
-                    item.File = File;
                     ppoSelection[i] = new EdmSelItem();
-                    ppoSelection[i].mlDocID = File.ID;
-                    ppoSelection[i].mlProjID = ParentFolder.ID;
+                    ppoSelection[i].mlDocID = item.File.ID;
+                    ppoSelection[i].mlProjID = item.bFolder;
                     i++;
                 }
 
@@ -100,19 +99,18 @@ namespace TreeModel
             }
         }
 
-        public void BatchGet()
+        public static  void BatchGet(List<Component> updateList)
         {
             int i = 0;
-            IEdmFile5 File = null;
-            IEdmFolder5 ParentFolder = null;
+
             try
             {
 
                 batchGetter = (IEdmBatchGet)vault.CreateUtility(EdmUtility.EdmUtil_BatchGet);
-                foreach (Part item in list)
+                foreach (Component item in updateList)
                 {
-                    File = vault1.GetFileFromPath(item.FullPath, out ParentFolder);
-                    batchGetter.AddSelectionEx((EdmVault5)vault1, File.ID, ParentFolder.ID, File.CurrentVersion);
+         
+                    batchGetter.AddSelectionEx((EdmVault5)vault1, item.File.ID, item.bFolder, item.CurVersion);
                     i++;
                 }
 
@@ -133,7 +131,7 @@ namespace TreeModel
                 MessageBox.Show(ex.Message);
             }
         }
-        */
+        
 
          static void  ConnectingPDM()
          {
@@ -141,7 +139,7 @@ namespace TreeModel
             {
                 if (!vault1.IsLoggedIn)
                 {
-                    vault1.LoginAuto("My", 0);
+                    vault1.LoginAuto("CUBY_PDM", 0);
                 }
                 vault = (IEdmVault7)vault1;
             }
