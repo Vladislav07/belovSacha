@@ -12,14 +12,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace TreeModel
 {
     public partial class SolidWorksMacro
     {
-     
-        
-        public async void Main()
+
+        List<Component> l;
+        public  void Main()
         {
             ModelDoc2 swModel = default(ModelDoc2); 
             ModelDocExtension Ext = default(ModelDocExtension);
@@ -46,7 +47,7 @@ namespace TreeModel
             compRoot = new Assembly("0", nameRoot, rootPath);
             Tree.AddPart(compRoot);
             // Insert BOM table
-            TemplateName = @"C:\CUBY_PDM\library\templates\BOM Templates\FullBOM_template.sldbomtbt";
+            TemplateName = "C:\\CUBY_PDM\\library\\templates\\Спецификация.sldbomtbt";
            // TemplateName = @"A:\My\library\templates\Спецификация.sldbomtbt";
             BomType = (int)swBomType_e.swBomType_Indented;
             Configuration = ".";
@@ -64,7 +65,7 @@ namespace TreeModel
             string e;
             string designation;
             string BomName;
-            
+
             BomName = swBOMFeature.Name;
             nNumRow = swTableAnn.RowCount;
 
@@ -97,11 +98,21 @@ namespace TreeModel
 
             Tree.GroupByCol();
             Tree.SearchForOldLinks();
-             boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
+            boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
             swModel.ClearSelection2(true);
-            List<Component> l = Tree.Print();
+          
+             l = Tree.Print();
+            try
+            {
+              CreateNewForm(l);
+            }
+            catch (Exception e1)
+            {
 
-            await Task.Run(() => CreateNewForm( l));
+                MessageBox.Show(e1.Message + "-" + e1.Source.ToString() + "77777");
+            }
+           
+         
             
             return;
         }
@@ -109,11 +120,18 @@ namespace TreeModel
    
         private void CreateNewForm(List<Component> l)
         {
-            Application.Run(new FormInfo(l));
-
+            FormInfo info = new FormInfo(l);
+            info.Action += Info_Action;
+            Application.Run(info);
         }
 
-        public void OpenAndRefresh(List<Component> list)
+        private void Info_Action()
+        {
+            PDM.BatchGet(l);
+            OpenAndRefresh(l);
+        }
+
+        private void OpenAndRefresh(List<Component> list)
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
             int errors = 0;
@@ -122,7 +140,7 @@ namespace TreeModel
             int lWarnings = 0;
             ModelDocExtension extMod;
             string fileName = null;
-
+            //swApp.CloseAllDocuments()
 
             try
             {
@@ -134,7 +152,7 @@ namespace TreeModel
                     {
 
                         fileName = item.FullPath;
-                        swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+                        swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
                         extMod = swModelDoc.Extension;
                         extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
                         swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
@@ -148,9 +166,9 @@ namespace TreeModel
               
                 }
             }
-            catch (Exception)
+            catch (Exception error)
             {
-                MessageBox.Show(errors.ToString());
+                MessageBox.Show(error.ToString());
 
             }
         }

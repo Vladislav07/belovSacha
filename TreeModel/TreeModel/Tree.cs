@@ -42,7 +42,9 @@ namespace TreeModel
         public static void SearchParentFromChildIsRebuild(string ChildNumber, string StructureNumberChild)
         {
             int index = StructureNumberChild.LastIndexOf(new char[] { '.' }[0]);
-            string ParentStrNumb = StructureNumberChild.Substring(0, index);
+            if (index == -1) return;
+
+            string ParentStrNumb = StructureNumberChild.Substring(0, StructureNumberChild.Length - index-1);
             Component comp = list.FirstOrDefault(p => p.StructureNumber == ParentStrNumb);
             comp.IsRebuild = true;
             if (comp.listRefChildError.ContainsKey(ChildNumber)) return;
@@ -85,14 +87,17 @@ namespace TreeModel
             var collection = list.GroupBy(p => p.Level);
 
             foreach (var company in collection)
+                
             {
                 foreach (Component item in company.Distinct(new CompPart()))
                 {
-                  
-                    if (item.IsRebuild == true)
+
+                    
+                    if (item.IsRebuild == true && item.State.Name=="In work")
                     {
                        
                        l.Add(item);
+                       Debug.Print(item.CubyNumber + "-" + item.IsRebuild.ToString());
                     }
 
                 }

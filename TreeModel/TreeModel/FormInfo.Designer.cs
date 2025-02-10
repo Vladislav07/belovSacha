@@ -69,7 +69,7 @@
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGridView;
-        private System.Windows.Forms.Button btnRebuild;
+        public System.Windows.Forms.DataGridView dataGridView;
+        public System.Windows.Forms.Button btnRebuild;
     }
 }

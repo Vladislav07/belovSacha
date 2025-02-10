@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EPDM.Interop.epdm;
+using System.ComponentModel;
 
 namespace TreeModel
 {
@@ -12,12 +13,17 @@ namespace TreeModel
    
         public string StructureNumber { get; private set; }
         public string CubyNumber { get; private set; }
+        [Browsable(false)]
         public string FullPath { get; private set; }
+        [Browsable(false)]
         IEdmFile5 _File = null;
         public int CurVersion { get; set; }
+        [Browsable(false)]
         public IEdmState5 State { get; set; }
+        [Browsable(false)]
         public int  bFolder { get; set; }
         public int Level { get; set; }
+        [Browsable(false)]
         public Dictionary<string, int> listRefChild;
         public Dictionary<string, string> listRefChildError;
         public bool IsRebuild { get; set; }

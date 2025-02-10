@@ -49,27 +49,36 @@ namespace TreeModel
             IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
             string cubyNumber = null;
             int verChildRef = -1;
-            while (!pos.IsNull)
+            try
             {
+                while (!pos.IsNull)
+                {
 
-                IEdmReference10 @ref = (IEdmReference10)ref5.GetNextChild(pos);
-                //
-                string extension = Path.GetExtension(@ref.Name);
-                if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
-                {
-                    cubyNumber = Path.GetFileNameWithoutExtension(@ref.Name);
-                    string regCuby = @"^CUBY-\d{8}$";
-                    bool IsCUBY = Regex.IsMatch(cubyNumber.Trim(), regCuby);
-                    if (!IsCUBY) continue;
-                    verChildRef = @ref.VersionRef;
-                    ass.listRefChild.Add(cubyNumber.Trim(), verChildRef);
-           
-                }
-                else
-                {
-                    ref5.GetNextChild(pos);
+                    IEdmReference10 @ref = (IEdmReference10)ref5.GetNextChild(pos);
+                    //
+                    string extension = Path.GetExtension(@ref.Name);
+                    if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
+                    {
+                        cubyNumber = Path.GetFileNameWithoutExtension(@ref.Name);
+                        string regCuby = @"^CUBY-\d{8}$";
+                        bool IsCUBY = Regex.IsMatch(cubyNumber.Trim(), regCuby);
+                        if (!IsCUBY) continue;
+                        verChildRef = @ref.VersionRef;
+                        ass.listRefChild.Add(cubyNumber.Trim(), verChildRef);
+
+                    }
+       
+                    //ref5.GetNextChild(pos);
                 }
             }
+
+            catch (Exception p)
+            {
+
+                MessageBox.Show("uuu" + p.Message);
+            }
+           
+            
         }
 
 
