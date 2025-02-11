@@ -13,11 +13,29 @@ namespace TreeModel
         
         static List<Component> list;
         static Dictionary<string, Component> listComp;
+        static Dictionary<string, Component> ModelTree;
         static Tree()
         {
            
             list = new List<Component>();
             listComp = new Dictionary<string, Component>();
+            ModelTree = new Dictionary<string, Component>();
+        }
+        public static void AddNode(string NodeNumber, string pathNode)
+        {
+
+            ModelTree.Add(NodeNumber, pathNode);
+        }
+
+        public Component GetComponentFromNumber(string numberCuby, string path)
+        {
+            Component comp = null;
+            foreach (KeyValuePair<string, Component> item in ModelTree)
+            {
+                comp = item.Value;
+                if (numberCuby == comp.CubyNumber) return comp; 
+            }
+            comp=new Component(numberCuby,)
         }
 
         public static void AddPart(Component part)
