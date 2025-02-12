@@ -17,6 +17,7 @@ namespace TreeModel
     public partial class MainForm : Form
     {
         SldWorks swApp;
+        public event Action Rebuild;
         ModelDoc2 swModel = default(ModelDoc2);
         ModelDocExtension Ext = default(ModelDocExtension);
         
@@ -33,7 +34,8 @@ namespace TreeModel
             swModel = (ModelDoc2)swApp.ActiveDoc;
             Ext = swModel.Extension;
             string rootPath = swModel.GetPathName();
-            Tree.AddNode("0",rootPath);
+            string nameRoot = Path.GetFileNameWithoutExtension(rootPath);
+            Tree.AddNode("0",nameRoot,rootPath);
         }
 
         void GetBomTable()
@@ -75,7 +77,7 @@ namespace TreeModel
                 if (e == ".SLDPRT" || e == ".sldprt" || e == ".SLDASM" || e == ".sldasm")
                 {
      
-                    Tree.AddNode(AddextendedNumber,PathName);
+                    Tree.AddNode(AddextendedNumber, PartNumberTrim,PathName);
                 }
 
             }
@@ -86,6 +88,37 @@ namespace TreeModel
             GetRootComponent();
             GetBomTable();
 
+        }
+
+        public void FillDataGridView()
+        {
+
+            dataGridView.Cursor = Cursors.WaitCursor;
+            dataGridView.ColumnCount = 7;
+            dataGridView.Columns[0].Name = "Structure Number";
+            dataGridView.Columns[1].Name = "Cuby Number";
+            dataGridView.Columns[2].Name = "Current Version";
+            dataGridView.Columns[3].Name = "List of Ref Child Errors";
+            dataGridView.Columns[4].Name = "Child";
+            dataGridView.Columns[5].Name = "Child info";
+            dataGridView.Columns[6].Name = "State";
+
+            if (tree.Count == 0)
+            {
+                btnRebuild.Enabled = false;
+            }
+            foreach (Component comp in tree)
+            {
+                dataGridView.Rows.Add(comp.StructureNumber, comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name.ToString());
+                if (comp.listRefChildError != null)
+                {
+                    foreach (KeyValuePair<string, string> i in comp.listRefChildError)
+                    {
+                        dataGridView.Rows.Add("", "", "", "", i.Key, i.Value);
+                    }
+                }
+            }
+            dataGridView.Cursor = Cursors.Default;
         }
     }
 }

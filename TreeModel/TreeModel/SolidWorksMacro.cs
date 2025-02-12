@@ -22,6 +22,7 @@ namespace TreeModel
         List<Component> l;
         public  void Main()
         {
+            /*
             ModelDoc2 swModel = default(ModelDoc2); 
             ModelDocExtension Ext = default(ModelDocExtension);
             BomTableAnnotation swBOMAnnotation = default(BomTableAnnotation);
@@ -93,6 +94,7 @@ namespace TreeModel
                    component = new Component(AddextendedNumber, PartNumberTrim, PathName);
                    Tree.AddPart(component);
                 }
+                */
                   
             }
 

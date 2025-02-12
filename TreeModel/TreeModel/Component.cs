@@ -11,31 +11,24 @@ namespace TreeModel
    public class Component
     { 
    
-        public string StructureNumber { get; private set; }
         public string CubyNumber { get; private set; }
-        [Browsable(false)]
         public string FullPath { get; private set; }
-        [Browsable(false)]
         IEdmFile5 _File = null;
         public int CurVersion { get; set; }
-        [Browsable(false)]
         public IEdmState5 State { get; set; }
-        [Browsable(false)]
         public int  bFolder { get; set; }
         public int Level { get; set; }
-        [Browsable(false)]
         public Dictionary<string, int> listRefChild;
         public Dictionary<string, string> listRefChildError;
         public bool IsRebuild { get; set; }
 
-        public Component(string sn, string cn, string fn)
+        public Component( string cn, string fn)
         {
-            StructureNumber = sn;
             CubyNumber = cn;
             FullPath = fn;
             listRefChild = new Dictionary<string, int>();
             listRefChildError = new Dictionary<string, string>();
-            Level = StructureNumber.Split(new char[] { '.' }).Length;
+          //  Level = StructureNumber.Split(new char[] { '.' }).Length;
 
             IsRebuild = false;
         }

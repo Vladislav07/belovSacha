@@ -10,24 +10,19 @@ namespace TreeModel
     public static class Tree
     {
 
-        
-        static List<Component> list;
-        static Dictionary<string, Component> listComp;
         static Dictionary<string, Component> ModelTree;
         static Tree()
         {
            
-            list = new List<Component>();
-            listComp = new Dictionary<string, Component>();
             ModelTree = new Dictionary<string, Component>();
         }
-        public static void AddNode(string NodeNumber, string pathNode)
+        public static void AddNode(string NodeNumber, string cubyNumber, string pathNode)
         {
 
-            ModelTree.Add(NodeNumber, pathNode);
+            ModelTree.Add(NodeNumber, GetComponentFromNumber(cubyNumber, pathNode));
         }
 
-        public Component GetComponentFromNumber(string numberCuby, string path)
+        public static Component GetComponentFromNumber(string numberCuby, string path)
         {
             Component comp = null;
             foreach (KeyValuePair<string, Component> item in ModelTree)
@@ -35,17 +30,11 @@ namespace TreeModel
                 comp = item.Value;
                 if (numberCuby == comp.CubyNumber) return comp; 
             }
-            comp=new Component(numberCuby,)
+            comp = new Component(numberCuby, path);
+            return comp;
         }
 
-        public static void AddPart(Component part)
-        {
-      
-            list.Add(part);
-            if (listComp.ContainsKey(part.CubyNumber)) return;
-            listComp.Add(part.CubyNumber, part);
-        }
-
+   
         public static int Part_IsChild(string cubyNumber, int VersChild)
         {
             if (!listComp.ContainsKey(cubyNumber)) return -1;
@@ -67,6 +56,14 @@ namespace TreeModel
             comp.IsRebuild = true;
             if (comp.listRefChildError.ContainsKey(ChildNumber)) return;
             comp.listRefChildError.Add(ChildNumber, "Rebuilding expected");
+        }
+
+        public static void FillCollection()
+        {
+            var uniqueComponentByGroup = ModelTree
+            .GroupBy(pair => pair.Key.Length)
+            .Select(group => group.Select(g => g.Value).Distinct().ToList())
+            //.ToList();
         }
 
        public static void  GroupByCol()
