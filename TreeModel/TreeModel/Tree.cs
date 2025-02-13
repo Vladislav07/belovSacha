@@ -11,10 +11,12 @@ namespace TreeModel
     {
 
         static Dictionary<string, Component> ModelTree;
+       public static List<Component> listComp;
         static Tree()
         {
            
             ModelTree = new Dictionary<string, Component>();
+            listComp = new List<Component>();
         }
         public static void AddNode(string NodeNumber, string cubyNumber, string pathNode)
         {
@@ -34,7 +36,7 @@ namespace TreeModel
             return comp;
         }
 
-   
+      /*
         public static int Part_IsChild(string cubyNumber, int VersChild)
         {
             if (!listComp.ContainsKey(cubyNumber)) return -1;
@@ -45,7 +47,7 @@ namespace TreeModel
            // if (comp.IsRebuild) return true;
             return -1;
         }
-
+        */
         public static void SearchParentFromChildIsRebuild(string ChildNumber, string StructureNumberChild)
         {
             int index = StructureNumberChild.LastIndexOf(new char[] { '.' }[0]);
@@ -57,15 +59,28 @@ namespace TreeModel
             if (comp.listRefChildError.ContainsKey(ChildNumber)) return;
             comp.listRefChildError.Add(ChildNumber, "Rebuilding expected");
         }
-
+      
         public static void FillCollection()
         {
+            char s = new char[] { '.' }[0];
+            int level_ = 0;
             var uniqueComponentByGroup = ModelTree
-            .GroupBy(pair => pair.Key.Length)
+            .GroupBy(pair => pair.Key.Count(o => o == s))
             .Select(group => group.Select(g => g.Value).Distinct().ToList())
-            //.ToList();
+            .ToList();
+            foreach (var item in uniqueComponentByGroup)
+            {
+                foreach (Component comp in item)
+                {
+                    comp.Level = level_;
+                    comp.GetEdmFile();
+                    comp.GetReferenceFromAssemble();
+                    listComp.Add(comp);
+                }
+                level_++;
+            }
         }
-
+        /*
        public static void  GroupByCol()
         {
             var collection = list.GroupBy(p => p.StructureNumber.Length);
@@ -120,5 +135,6 @@ namespace TreeModel
             }
             return l;
         }
+        */
     }
 }

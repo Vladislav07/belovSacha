@@ -44,7 +44,7 @@ namespace TreeModel
             }
             foreach (Component comp in tree)
             {
-                dataGridView.Rows.Add(comp.StructureNumber, comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name.ToString());
+                dataGridView.Rows.Add( "",comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name.ToString());
                 if (comp.listRefChildError != null)
                 {
                     foreach (KeyValuePair<string, string> i in comp.listRefChildError)

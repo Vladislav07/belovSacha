@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -45,7 +46,11 @@ namespace TreeModel
             string TemplateName = "C:\\CUBY_PDM\\library\\templates\\Спецификация.sldbomtbt";
             int nbrType = (int)swNumberingType_e.swNumberingType_Detailed;
             int BomType = (int)swBomType_e.swBomType_Indented;
+           // Stopwatch stopwatch = new Stopwatch();
+           // stopwatch.Start();
             swBOMAnnotation = Ext.InsertBomTable3(TemplateName, 0, 0, BomType, Configuration, false, nbrType, false);
+            //stopwatch.Stop();
+           // MessageBox.Show(stopwatch.Elapsed.ToString());
             swBOMFeature = swBOMAnnotation.BomFeature;
 
             TableAnnotation swTableAnn = (TableAnnotation)swBOMAnnotation;
@@ -57,6 +62,7 @@ namespace TreeModel
             string e;
             string designation;
             string BomName;
+            bool boolstatus = false;
 
             BomName = swBOMFeature.Name;
             nNumRow = swTableAnn.RowCount;
@@ -81,13 +87,16 @@ namespace TreeModel
                 }
 
             }
+            boolstatus = Ext.SelectByID2(BomName, "ANNOTATIONTABLES", 0, 0, 0, false, 0, null, 0);
+            swModel.ClearSelection2(true);
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             GetRootComponent();
             GetBomTable();
-
+            Tree.FillCollection();
+            FillDataGridView();
         }
 
         public void FillDataGridView()
@@ -95,30 +104,32 @@ namespace TreeModel
 
             dataGridView.Cursor = Cursors.WaitCursor;
             dataGridView.ColumnCount = 7;
-            dataGridView.Columns[0].Name = "Structure Number";
+            dataGridView.Columns[0].Name = "Level";
             dataGridView.Columns[1].Name = "Cuby Number";
             dataGridView.Columns[2].Name = "Current Version";
             dataGridView.Columns[3].Name = "List of Ref Child Errors";
             dataGridView.Columns[4].Name = "Child";
             dataGridView.Columns[5].Name = "Child info";
             dataGridView.Columns[6].Name = "State";
+            int level = 0;
 
-            if (tree.Count == 0)
-            {
-                btnRebuild.Enabled = false;
-            }
-            foreach (Component comp in tree)
-            {
-                dataGridView.Rows.Add(comp.StructureNumber, comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name.ToString());
-                if (comp.listRefChildError != null)
+                foreach (Component comp in Tree.listComp)
                 {
-                    foreach (KeyValuePair<string, string> i in comp.listRefChildError)
+                    dataGridView.Rows.Add(comp.Level.ToString(),comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", "");
+                    if (comp.listRefChildError != null)
                     {
-                        dataGridView.Rows.Add("", "", "", "", i.Key, i.Value);
+                        foreach (KeyValuePair<string, string> i in comp.listRefChildError)
+                        {
+                            dataGridView.Rows.Add("", "","", "", "", i.Key, i.Value);
+                        }
                     }
+                    level++;
                 }
-            }
+              
             dataGridView.Cursor = Cursors.Default;
         }
+            
+         
+        
     }
 }

@@ -43,7 +43,7 @@ namespace TreeModel
                 
             }
         }
-
+        /*
         public void isNeedsRebuld()
         {
             if (listRefChild == null) return;
@@ -61,7 +61,7 @@ namespace TreeModel
             }
         }
 
-      
+      */
     }
     public class CompPart : EqualityComparer<Component>
     {
