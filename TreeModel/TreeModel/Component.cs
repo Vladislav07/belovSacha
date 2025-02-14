@@ -20,6 +20,7 @@ namespace TreeModel
         public int Level { get; set; }
         public Dictionary<string, int> listRefChild;
         public Dictionary<string, string> listRefChildError;
+        public List<string> listParent;
         public bool IsRebuild { get; set; }
 
         public Component( string cn, string fn)
@@ -28,7 +29,8 @@ namespace TreeModel
             FullPath = fn;
             listRefChild = new Dictionary<string, int>();
             listRefChildError = new Dictionary<string, string>();
-          //  Level = StructureNumber.Split(new char[] { '.' }).Length;
+            listParent = new List<string>();
+            //  Level = StructureNumber.Split(new char[] { '.' }).Length;
 
             IsRebuild = false;
         }
@@ -43,10 +45,10 @@ namespace TreeModel
                 
             }
         }
-        /*
+    
         public void isNeedsRebuld()
         {
-            if (listRefChild == null) return;
+            if (listRefChild.Count == 0) return;
             foreach (KeyValuePair<string,int> item in listRefChild)
             {
    
@@ -55,13 +57,20 @@ namespace TreeModel
                 {
                     IsRebuild = true;
                     listRefChildError.Add(item.Key, item.Value.ToString() + "/"+ isVers.ToString());
-                    Tree.SearchParentFromChildIsRebuild(CubyNumber, StructureNumber);
                 }
           
             }
+            if (IsRebuild)
+            {
+                foreach (string item in listParent)
+                {
+                    Tree.SearchForOldLinks(item);
+                }
+            }
+      
         }
 
-      */
+ 
     }
     public class CompPart : EqualityComparer<Component>
     {

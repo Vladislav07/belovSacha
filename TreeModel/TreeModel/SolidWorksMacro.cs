@@ -22,9 +22,17 @@ namespace TreeModel
     
         public  void Main()
         {
-            MainForm info = new MainForm(swApp);
+            SW.swApp = swApp;
+            SW.GetRootComponent();
+            SW.GetBomTable();
+            Tree.SearchParentFromChild();
+            Tree.FillCollection();
+            Tree.CompareVersions();
+            MainForm info = new MainForm();
+           
             info.Rebuild += Info_Rebuild;
-            Application.Run(info);
+            info.ShowDialog();
+          //  Application.Run(info);
           
         }
 
