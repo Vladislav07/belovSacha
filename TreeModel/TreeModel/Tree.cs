@@ -116,5 +116,11 @@ namespace TreeModel
         {
 
         }
+        public static List<Component> FillToListIsRebuild()
+        {
+            List<Component> l = listComp.Where(c => c.IsRebuild == true).ToList();
+            return l;
+        
+        }
     }
 }

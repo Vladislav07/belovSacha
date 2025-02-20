@@ -22,31 +22,22 @@ namespace TreeModel
     
         public  void Main()
         {
-            SW.swApp = swApp;
-            SW.GetRootComponent();
-            SW.GetBomTable();
-            Tree.SearchParentFromChild();
-            Tree.FillCollection();
-            Tree.CompareVersions();
-            MainForm info = new MainForm();
+          
+            MainForm info = new MainForm(swApp);
            
             info.Rebuild += Info_Rebuild;
-            info.ShowDialog();
-          //  Application.Run(info);
+          //  info.ShowDialog();
+            Application.Run(info);
           
         }
 
         private void Info_Rebuild()
         {
-            MessageBox.Show("111");
+            List<Component> list = Tree.FillToListIsRebuild();
+            list.Reverse();
+            OpenAndRefresh(list);
         }
 
-        /*
-        private void Info_Action()
-        {
-            PDM.BatchGet(l);
-            OpenAndRefresh(l);
-        }
 
         private void OpenAndRefresh(List<Component> list)
         {
@@ -61,27 +52,16 @@ namespace TreeModel
 
             try
             {
-                var collection = list.GroupBy(p => p.StructureNumber.Length);
-
-                foreach (var company in collection)
+                foreach (Component item in list)
                 {
-                    foreach (Component item in company.Distinct(new CompPart()))
-                    {
-
-                        fileName = item.FullPath;
-                        swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
-                        extMod = swModelDoc.Extension;
-                        extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
-                        swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
-                        swApp.CloseDoc(fileName);
-                        swModelDoc = null;
-
-                    }
-
-                }
-                {
-              
-                }
+                    fileName = item.FullPath;
+                    swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocASSEMBLY, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
+                    extMod = swModelDoc.Extension;
+                    extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
+                    swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+                    swApp.CloseDoc(fileName);
+                    swModelDoc = null;
+                }                    
             }
             catch (Exception error)
             {
@@ -89,7 +69,7 @@ namespace TreeModel
 
             }
         }
-        */
+  
 
         public SldWorks swApp;
 

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.dataGridView = new System.Windows.Forms.DataGridView();
+            this.btn_Rebuild = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -45,11 +46,22 @@
             this.dataGridView.Size = new System.Drawing.Size(854, 349);
             this.dataGridView.TabIndex = 0;
             // 
+            // btn_Rebuild
+            // 
+            this.btn_Rebuild.Location = new System.Drawing.Point(21, 355);
+            this.btn_Rebuild.Name = "btn_Rebuild";
+            this.btn_Rebuild.Size = new System.Drawing.Size(75, 23);
+            this.btn_Rebuild.TabIndex = 1;
+            this.btn_Rebuild.Text = "&Rebuild";
+            this.btn_Rebuild.UseVisualStyleBackColor = true;
+            this.btn_Rebuild.Click += new System.EventHandler(this.btn_Rebuild_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(854, 443);
+            this.ClientSize = new System.Drawing.Size(854, 385);
+            this.Controls.Add(this.btn_Rebuild);
             this.Controls.Add(this.dataGridView);
             this.Name = "MainForm";
             this.Text = "MainForm";
@@ -62,5 +74,6 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dataGridView;
+        private System.Windows.Forms.Button btn_Rebuild;
     }
 }

@@ -18,10 +18,19 @@ namespace TreeModel
     public partial class MainForm : Form
     {
         public event Action Rebuild;
+        SldWorks swApp;
+     
 
-        public MainForm()
+        public MainForm(SldWorks swApp_)
         {
             InitializeComponent();
+            swApp = swApp_;
+            SW.swApp = swApp;
+            SW.GetRootComponent();
+            SW.GetBomTable();
+            Tree.SearchParentFromChild();
+            Tree.FillCollection();
+            Tree.CompareVersions();
 
         }
 
@@ -29,13 +38,13 @@ namespace TreeModel
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-          
-           
-            FillDataGridView();
+
+            List < Component > list = Tree.FillToListIsRebuild();
+            FillDataGridView(list);
             
         }
 
-        public void FillDataGridView()
+        public void FillDataGridView(List<Component> listComp)
         {
             
             dataGridView.Cursor = Cursors.WaitCursor;
@@ -49,7 +58,7 @@ namespace TreeModel
             dataGridView.Columns[6].Name = "State";
             int level = 0;
 
-                foreach (Component comp in Tree.listComp)
+                foreach (Component comp in listComp)
                 {
                     dataGridView.Rows.Add(comp.Level.ToString(),comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name);
                     if (comp.listRefChildError != null)
@@ -65,8 +74,15 @@ namespace TreeModel
               
             dataGridView.Cursor = Cursors.Default;
         }
-            
-         
-        
+
+        private void btn_Rebuild_Click(object sender, EventArgs e)
+        {
+            List<Component> list = Tree.FillToListIsRebuild();
+            PDM.BatchGet(list);
+            if (Rebuild != null)
+            {
+                Rebuild.Invoke();
+            }
+        }
     }
 }
