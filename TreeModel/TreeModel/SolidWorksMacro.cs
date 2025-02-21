@@ -33,7 +33,7 @@ namespace TreeModel
 
         private void Info_Rebuild()
         {
-            List<Component> list = Tree.FillToListIsRebuild();
+            List<Component> list = Tree.listComp.Where(c => c.IsRebuild == true).ToList();
             list.Reverse();
             OpenAndRefresh(list);
         }

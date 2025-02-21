@@ -19,11 +19,12 @@ namespace TreeModel
     {
         public event Action Rebuild;
         SldWorks swApp;
-     
+        DataTable dt;
 
         public MainForm(SldWorks swApp_)
         {
             InitializeComponent();
+           
             swApp = swApp_;
             SW.swApp = swApp;
             SW.GetRootComponent();
@@ -38,46 +39,27 @@ namespace TreeModel
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-
-            List < Component > list = Tree.FillToListIsRebuild();
-            FillDataGridView(list);
+            this.dataGridView.AutoGenerateColumns = true;
+            DataTable dt = new DataTable();
+            Tree.FillToListIsRebuild(ref dt);
+            FillDataGridView(dt);
             
         }
 
-        public void FillDataGridView(List<Component> listComp)
+        public void FillDataGridView(DataTable dt)
         {
             
             dataGridView.Cursor = Cursors.WaitCursor;
-            dataGridView.ColumnCount = 7;
-            dataGridView.Columns[0].Name = "Level";
-            dataGridView.Columns[1].Name = "Cuby Number";
-            dataGridView.Columns[2].Name = "Current Version";
-            dataGridView.Columns[3].Name = "List of Ref Child Errors";
-            dataGridView.Columns[4].Name = "Child";
-            dataGridView.Columns[5].Name = "Child info";
-            dataGridView.Columns[6].Name = "State";
-            int level = 0;
+            this.bindingSource1.DataSource = dt;
+            for (int i = 0; i < dataGridView.Columns.Count; i++)
+            { dataGridView.Columns[i].ReadOnly = true; }
 
-                foreach (Component comp in listComp)
-                {
-                    dataGridView.Rows.Add(comp.Level.ToString(),comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name);
-                    if (comp.listRefChildError != null)
-                    {
-                     foreach (KeyValuePair<string, string> i in comp.listRefChildError)
-
-                    {
-                            dataGridView.Rows.Add("", "","", "", i.Key, i.Value, "");
-                        }
-                    }
-                    level++;
-                }
-              
             dataGridView.Cursor = Cursors.Default;
         }
 
         private void btn_Rebuild_Click(object sender, EventArgs e)
         {
-            List<Component> list = Tree.FillToListIsRebuild();
+            List<Component> list = Tree.listComp.Where(c => c.IsRebuild == true).ToList();
             PDM.BatchGet(list);
             if (Rebuild != null)
             {

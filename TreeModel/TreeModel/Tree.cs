@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Data;
 
 namespace TreeModel
 {
@@ -116,11 +117,37 @@ namespace TreeModel
         {
 
         }
-        public static List<Component> FillToListIsRebuild()
+        public static void FillToListIsRebuild(ref DataTable dt)
         {
             List<Component> l = listComp.Where(c => c.IsRebuild == true).ToList();
-            return l;
-        
+
+            dt.Columns.Add("Level", typeof(string));
+            dt.Columns.Add("Cuby Number", typeof(string));
+            dt.Columns.Add("Current Version", typeof(string));
+            dt.Columns.Add("List of Ref Child Errors", typeof(string));
+            dt.Columns.Add("Child", typeof(string));
+            dt.Columns.Add("Child info", typeof(string));
+            dt.Columns.Add("State", typeof(string));
+         
+       
+            int level = 0;
+
+            foreach (Component comp in listComp)
+            {
+                dt.Rows.Add(comp.Level.ToString(), comp.CubyNumber, comp.CurVersion.ToString(), comp.IsRebuild.ToString(), "", "", comp.State.Name);
+                if (comp.listRefChildError != null)
+                {
+                    foreach (KeyValuePair<string, string> i in comp.listRefChildError)
+
+                    {
+                        dt.Rows.Add("", "", "", "", i.Key, i.Value, "");
+                    }
+                }
+                level++;
+            }
+
+          
+
         }
     }
 }
