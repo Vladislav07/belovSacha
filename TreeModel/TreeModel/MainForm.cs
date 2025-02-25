@@ -20,18 +20,35 @@ namespace TreeModel
         public event Action Rebuild;
         SldWorks swApp;
         DataTable dt;
+        public event EventHandler<string> OperationCompleted;
 
         public MainForm(SldWorks swApp_)
         {
             InitializeComponent();
-           
             swApp = swApp_;
-            SW.swApp = swApp;
-            SW.GetRootComponent();
-            SW.GetBomTable();
-            Tree.SearchParentFromChild();
-            Tree.FillCollection();
-            Tree.CompareVersions();
+        
+            BackgroundWorker backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += (sender, e) =>
+            {
+               
+                SW.swApp = swApp;
+                SW.GetRootComponent();
+                SW.GetBomTable();
+                Tree.SearchParentFromChild();
+                Tree.FillCollection();
+                Tree.CompareVersions();
+            };
+
+            backgroundWorker.RunWorkerCompleted += (sender, e) =>
+            {
+                this.dataGridView.AutoGenerateColumns = true;
+                DataTable dt = new DataTable();
+                Tree.FillToListIsRebuild(ref dt);
+                FillDataGridView(dt);
+                OperationCompleted.Invoke(this, "Operation complete");
+            };
+
+            backgroundWorker.RunWorkerAsync();
 
         }
 
@@ -39,10 +56,8 @@ namespace TreeModel
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            this.dataGridView.AutoGenerateColumns = true;
-            DataTable dt = new DataTable();
-            Tree.FillToListIsRebuild(ref dt);
-            FillDataGridView(dt);
+
+         
             
         }
 

@@ -24,7 +24,10 @@ namespace TreeModel
         {
           
             MainForm info = new MainForm(swApp);
-           
+            info.OperationCompleted += (sender, message) =>
+            {
+                MessageBox.Show(message);
+            };
             info.Rebuild += Info_Rebuild;
           //  info.ShowDialog();
             Application.Run(info);
